@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chat App</title>
+<title>AI Chat</title>
 
 <style>
 body {
@@ -17,7 +17,7 @@ body {
 
 #chat {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -28,7 +28,6 @@ body {
   padding: 10px;
   border-radius: 12px;
   max-width: 75%;
-  word-wrap: break-word;
 }
 
 .user {
@@ -41,7 +40,7 @@ body {
   align-self: flex-start;
 }
 
-#inputBar {
+#bar {
   display: flex;
   padding: 10px;
   background: #111827;
@@ -51,18 +50,16 @@ body {
 input {
   flex: 1;
   padding: 12px;
-  border: none;
   border-radius: 10px;
-  outline: none;
+  border: none;
 }
 
 button {
-  padding: 12px 16px;
+  padding: 12px;
   border: none;
   border-radius: 10px;
   background: #22c55e;
   color: white;
-  font-weight: bold;
 }
 </style>
 
@@ -72,7 +69,7 @@ button {
 
 <div id="chat"></div>
 
-<div id="inputBar">
+<div id="bar">
   <input id="input" placeholder="Ask something..." />
   <button onclick="send()">Send</button>
 </div>
@@ -80,11 +77,11 @@ button {
 <script>
 const API = "https://my-ai-app.potapenkomilan.workers.dev";
 
-function addMsg(text, type) {
-  const div = document.createElement("div");
-  div.className = "msg " + type;
-  div.innerText = text;
-  document.getElementById("chat").appendChild(div);
+function add(text, type) {
+  const d = document.createElement("div");
+  d.className = "msg " + type;
+  d.innerText = text;
+  document.getElementById("chat").appendChild(d);
   document.getElementById("chat").scrollTop = 999999;
 }
 
@@ -93,30 +90,25 @@ async function send() {
   const text = input.value.trim();
   if (!text) return;
 
-  addMsg(text, "user");
+  add(text, "user");
   input.value = "";
 
   try {
     const res = await fetch(API, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: text
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
     });
 
     const data = await res.json();
-    addMsg(data.reply || "No response", "ai");
+    add(data.reply || "No response", "ai");
 
-  } catch (err) {
-    addMsg("Error: " + err.message, "ai");
+  } catch (e) {
+    add("Error: " + e.message, "ai");
   }
 }
 
-// ENTER key support
-document.getElementById("input").addEventListener("keydown", function(e) {
+document.getElementById("input").addEventListener("keydown", e => {
   if (e.key === "Enter") send();
 });
 </script>
